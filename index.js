@@ -41,10 +41,9 @@ async function getAccessToken() {
     oAuth2Client.setCredentials(tokens);
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
     console.log('Token stored to', TOKEN_PATH);
-    await startProcess();
   } catch (err) {
     console.error('Error retrieving access token:', err);
-    return getAccessToken(); // Retry if there's an error
+    process.exit(1); // Exit with an error code
   }
 }
 
@@ -100,9 +99,33 @@ function validateDate(dateStr) {
   return date.getUTCDate() === day && date.getUTCMonth() === month - 1 && date.getUTCFullYear() === year;
 }
 
+// Function to read token from file or get a new one if needed
+async function ensureToken() {
+  if (fs.existsSync(TOKEN_PATH)) {
+    try {
+      const token = fs.readFileSync(TOKEN_PATH, 'utf8');
+      if (token) {
+        oAuth2Client.setCredentials(JSON.parse(token));
+        return;
+      } else {
+        console.error('Token file is empty.');
+      }
+    } catch (parseError) {
+      console.error('Error parsing token JSON:', parseError);
+    }
+  }
+
+  // If token does not exist or is invalid, get a new one
+  await getAccessToken();
+}
+
 // Function to start the process
 async function startProcess() {
   try {
+    // Ensure token is valid or obtain a new one
+    await ensureToken();
+
+    // Prompt for user input
     let calendarId;
     while (!calendarId) {
       calendarId = await promptUser('Enter your Calendar ID: ');
@@ -157,24 +180,13 @@ async function startProcess() {
       return startProcess(); // Restart the process if no event names are found
     }
 
-    // Read token and start the process
-    try {
-      const token = fs.readFileSync(TOKEN_PATH, 'utf8');
-      if (!token) {
-        console.error('Token file is empty.');
-        return getAccessToken(); // Retry if the token is empty
-      }
-      oAuth2Client.setCredentials(JSON.parse(token));
-      await deleteEventsInDateRange(oAuth2Client, calendarId, startTime, endTime, eventsName);
-      console.log('Process completed successfully.');
-      process.exit(0); // Exit with a success code
-    } catch (parseError) {
-      console.error('Error parsing token JSON:', parseError);
-      return getAccessToken(); // Retry if there's a parsing error
-    }
+    // Proceed to delete events
+    await deleteEventsInDateRange(oAuth2Client, calendarId, startTime, endTime, eventsName);
+    console.log('Process completed successfully.');
+    process.exit(0); // Exit with a success code
   } catch (error) {
     console.error('Error:', error);
-    return startProcess(); // Restart the process if there's a general error
+    process.exit(1); // Exit with an error code
   }
 }
 

@@ -1,5 +1,6 @@
 ![Untitled-1](https://github.com/user-attachments/assets/39be62f9-4aef-4ef3-a5c3-7291195f6f5f)
 # Google Calendar Bulk Delete Events
+
 This script allows you to delete events from your Google Calendar within a specified date range, based on event names listed in a text file (`eventsName.txt`). The script interacts with the Google Calendar API and requires OAuth 2.0 credentials for access.
 
 ## Table of Contents
@@ -34,19 +35,19 @@ Before you start, ensure you have the following installed:
 
 2. **Install dependencies:**
 
-   In the project directory, run the following command:
+   In the project directory, run:
 
    ```bash
    npm install
    ```
 
 3. **Prepare OAuth credentials:**
-   
+
    Follow the instructions in the [Creating OAuth Credentials](#creating-oauth-credentials) section to set up your OAuth 2.0 credentials.
 
 4. **Create the `token.json` file:**
 
-   The script will guide you through this process the first time you run it.
+   The script will guide you through this process the first time you run it if the file does not already exist.
 
 ## Creating OAuth Credentials
 
@@ -110,26 +111,28 @@ To run the script, follow these steps:
    node index.js
    ```
 
-   The script will prompt you for the following:
+   The script will first check for the presence of the `token.json` file:
 
-   - **Calendar ID**: Enter the email address associated with the Google Calendar you want to modify (e.g., `your.email@gmail.com`).
-   - **Start Date**: The start date of the range in `dd/mm/yyyy` format.
-   - **End Date**: The end date of the range in `dd/mm/yyyy` format.
+   - **If the token is present and valid:** The script will prompt you for:
+     - **Calendar ID**: Enter the email address associated with the Google Calendar you want to modify (e.g., `your.email@gmail.com`).
+     - **Start Date**: The start date of the range in `dd/mm/yyyy` format.
+     - **End Date**: The end date of the range in `dd/mm/yyyy` format.
 
-2. **Authorize the app:**
+   - **If the token is missing or invalid:** The script will guide you through the OAuth authorization process. Follow the provided URL to authorize the app and enter the authorization code. When you reach `localhost`, take the **code** parameter from the URL. For example, from a URL like `http://localhost/?code=4/0AQlEXXXXXXoiafaow96gd2aCs58A&scope=https://www.googleapis.com/auth/calendar`, you should take `4/0AQlEXXXXXXoiafaow96gd2aCs58A`.
 
-   - If this is the first time running the script, you will be prompted to authorize the application. A URL will be provided.
-   - Visit the URL, grant the necessary permissions, and enter the code provided into the script prompt.
+2. **Authorize the app (if needed):**
+
+   - If prompted, visit the URL provided, grant the necessary permissions, and enter the code into the script prompt.
 
 3. **The script will proceed to delete the specified events within the date range.**
 
-   - The events matching the names listed in `eventsName.txt` within the specified date range will be deleted.
+   - Events matching the names listed in `eventsName.txt` within the specified date range will be deleted.
 
 ## Error Handling and User Prompts
 
-- **Invalid Input:** If the user inputs an invalid date format, Calendar ID, or any other incorrect value, the script will prompt the user to re-enter the value.
-- **Missing Files:** If the `eventsName.txt` file is missing or improperly formatted, the script will alert the user and request corrections.
-- **OAuth Token Issues:** If the OAuth token is missing or invalid, the script will guide the user through the authorization process again.
+- **Invalid Input:** If you input an invalid date format, Calendar ID, or any other incorrect value, the script will prompt you to re-enter the value.
+- **Missing Files:** If the `eventsName.txt` file is missing or improperly formatted, the script will alert you and request corrections.
+- **OAuth Token Issues:** If the OAuth token is missing or invalid, the script will guide you through the authorization process again.
 
 ## License
 
