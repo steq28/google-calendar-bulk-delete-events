@@ -1,6 +1,5 @@
+![Untitled-1](https://github.com/user-attachments/assets/39be62f9-4aef-4ef3-a5c3-7291195f6f5f)
 # Google Calendar Bulk Delete Events
----
-
 This script allows you to delete events from your Google Calendar within a specified date range, based on event names listed in a text file (`eventsName.txt`). The script interacts with the Google Calendar API and requires OAuth 2.0 credentials for access.
 
 ## Table of Contents
